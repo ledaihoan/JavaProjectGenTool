@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+repositories {
+    mavenCentral()
+    maven {
+        url  "https://dl.bintray.com/ledaihoan/io.github.ledaihoan"
+    }
+}
+version '1.0.0'
+
+sourceCompatibility = 1.8
+applicationDefaultJvmArgs = ["-Dappname=SampleProject -Dappprof=development -DconfigExt=properties,log4j.properties"]
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'io.github.ledaihoan:common-servlet:1.0.0'
+}
