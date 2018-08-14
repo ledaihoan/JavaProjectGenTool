@@ -12,6 +12,14 @@ version '1.0.0'
 
 sourceCompatibility = 1.8
 mainClassName = "com.hoanld.sampleproject.app.MainApp"
+applicationDistribution.from('config') {
+    into "bin/config"
+}
+startScripts {
+    doLast {
+        delete windowsScript
+    }
+}
 applicationDefaultJvmArgs = ["-Dappname=SampleProject -Dappprof=development -DconfigExt=properties,log4j.properties"]
 
 dependencies {
