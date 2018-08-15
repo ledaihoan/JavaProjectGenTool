@@ -1,0 +1,29 @@
+ext.APP_NAME = 'SampleProject'
+ext.runBlock = 'TMP_DIR="/data/tmpLog/$APP_NAME"\n' +
+        'PID_PATH="$TMP_DIR/$APP_NAME.pid"\n' +
+        'LOG_PATH="$TMP_DIR/$APP_NAME.log"\n' +
+        'if [ -e "$PID_PATH" ]; then\n' +
+        'echo "Application is already running!"\n' +
+        'echo\n' +
+        'exit 1\n' +
+        'fi\n' +
+        '"$JAVACMD" "$@" 1>>"$LOG_PATH" 2>>"$LOG_PATH" &\n' +
+        '/bin/echo -n $! > "$PID_PATH"\n' +
+        'echo "Application is running!"\n' +
+        'exit 1'
+ext.stopBlock = '#!/usr/bin/env sh\n' +
+        'APP_NAME="' + APP_NAME + '"\n' +
+        'TMP_DIR="/data/tmpLog/$APP_NAME"\n' +
+        'PID_PATH="$TMP_DIR/$APP_NAME.pid"\n' +
+        'LOG_PATH="$TMP_DIR/$APP_NAME.log"\n' +
+        'if [ ! -e "$PID_PATH" ]; then\n' +
+        'echo "Application already stopped!"\n' +
+        'echo\n' +
+        'exit 1\n' +
+        'fi\n' +
+        '#stop app\n' +
+        'kill -9 `cat $PID_PATH`\n' +
+        'rm -f $PID_PATH\n' +
+        'echo "Stopped"\n' +
+        'echo\n' +
+        'exit 1'

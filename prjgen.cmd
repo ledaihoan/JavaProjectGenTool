@@ -2,13 +2,13 @@
 From="SampleProject"
 To=$1
 PKG="$(echo $To | tr '[A-Z]' '[a-z]')"
-//keep sure that unecessary folder will be removed
+# keep sure that unecessary folder will be removed
 cd SampleProject
 rm build -rf
 rm .idea -rf
 rm .gradle -rf
 cd ..
-//end remove block
+# end remove block
 FROM=`echo $From | tr [:lower:] [:upper:]`
 TO=`echo $To | tr [:lower:] [:upper:]`
 

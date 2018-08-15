@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
 }
+apply from: './runscript.gradle'
 repositories {
     mavenCentral()
     maven {
@@ -15,13 +16,29 @@ mainClassName = "com.hoanld.sampleproject.app.MainApp"
 applicationDistribution.from('config') {
     into "bin/config"
 }
+applicationDefaultJvmArgs = ["-Dappname=$APP_NAME", "-Dappprof=development", "-DconfigExt=properties,log4j.properties"]
+task createStopScript(type: CreateStartScripts) {
+    mainClassName = "StopApp"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    applicationName = 'stop'
+    defaultJvmOpts = ["-Xms1024m", "-Xmx2048m"]
+    doLast {
+        delete windowsScript
+        unixScript.text = stopBlock
+    }
+}
 startScripts {
     doLast {
         delete windowsScript
+        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', runBlock)
     }
 }
-applicationDefaultJvmArgs = ["-Dappname=SampleProject -Dappprof=development -DconfigExt=properties,log4j.properties"]
-
+applicationDistribution.into("bin") {
+    duplicatesStrategy= DuplicatesStrategy.EXCLUDE
+    from(createStopScript)
+    fileMode = 0755
+}
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'io.github.ledaihoan:common-servlet:1.0.0'
