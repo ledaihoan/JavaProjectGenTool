@@ -16,6 +16,9 @@ mainClassName = "com.hoanld.sampleproject.app.MainApp"
 applicationDistribution.from('config') {
     into "bin/config"
 }
+applicationDistribution.from('public') {
+    into "bin/public"
+}
 applicationDefaultJvmArgs = ["-Dappname=$APP_NAME", "-Dappprof=development", "-DconfigExt=properties,log4j.properties"]
 task createStopScript(type: CreateStartScripts) {
     mainClassName = "StopApp"
