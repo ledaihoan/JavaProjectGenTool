@@ -33,3 +33,8 @@ First, you need to build project
 ```
 user@Server:..$YourProject/bin$ ./YourProjectName
 ```
+- To stop your app: run "stop" in the same "bin" folder
+```
+user@Server:..$YourProject/bin$ ./stop
+```
+More bashscript will be added soon for better monitoring support
