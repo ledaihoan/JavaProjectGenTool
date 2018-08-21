@@ -9,17 +9,29 @@ repositories {
         url  "https://dl.bintray.com/ledaihoan/io.github.ledaihoan"
     }
 }
-version '1.0.0'
+version '1.0.1'
 
 sourceCompatibility = 1.8
 mainClassName = "com.hoanld.sampleproject.app.MainApp"
+
+applicationDefaultJvmArgs = ["-Dappname=$APP_NAME", "-Dappprof=development", "-DconfigExt=properties,log4j.properties"]
+
+//copy static files into distributions
 applicationDistribution.from('config') {
     into "bin/config"
 }
 applicationDistribution.from('public') {
     into "bin/public"
 }
-applicationDefaultJvmArgs = ["-Dappname=$APP_NAME", "-Dappprof=development", "-DconfigExt=properties,log4j.properties"]
+//startscripts: run service
+startScripts {
+    doLast {
+        delete windowsScript
+        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', runBlock)
+    }
+}
+
+//extra startscripts: stop script
 task createStopScript(type: CreateStartScripts) {
     mainClassName = "StopApp"
     classpath = startScripts.classpath
@@ -31,18 +43,57 @@ task createStopScript(type: CreateStartScripts) {
         unixScript.text = stopBlock
     }
 }
-startScripts {
-    doLast {
-        delete windowsScript
-        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', runBlock)
-    }
-}
 applicationDistribution.into("bin") {
     duplicatesStrategy= DuplicatesStrategy.EXCLUDE
     from(createStopScript)
     fileMode = 0755
 }
+//extra startscripts: deploy script
+task createDeployScript(type: CreateStartScripts) {
+    mainClassName = "DeployApp"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    applicationName = 'deploy.sh'
+    defaultJvmOpts = ["-Xms1024m", "-Xmx2048m"]
+    doLast {
+        delete windowsScript
+        unixScript.text = deployBlock
+    }
+}
+applicationDistribution.into("bin") {
+    duplicatesStrategy= DuplicatesStrategy.EXCLUDE
+    from(createDeployScript)
+    fileMode = 0755
+}
+//dependencies
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'io.github.ledaihoan:common-servlet:1.0.0'
+    compile 'io.github.ledaihoan:common-servlet:1.0.1'
+}
+//disabled tar artifact
+tasks.distTar.enabled = false
+//after build, unzip distZip and put in to "dist" folder
+clean {
+    doFirst {
+        delete "$projectDir/dist"
+    }
+}
+build {
+    doLast {
+        def zipPath = "${buildDir}/distributions/${project.name}-${project.version}.zip"
+        def zipFile = file(zipPath)
+        def outputDir = "${projectDir}/dist"
+        def deployFile = "${projectDir}/dist/${project.name}-${project.version}/bin/deploy.sh"
+        def deployMv = "${projectDir}/dist/${project.name}-${project.version}/"
+        copy {
+            from zipTree(zipFile)
+            into outputDir
+        }
+        copy {
+            from file(deployFile)
+            into file(deployMv)
+        }
+        delete deployFile
+        delete zipPath
+    }
 }

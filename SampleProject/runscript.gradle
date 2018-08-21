@@ -2,6 +2,7 @@ ext.APP_NAME = 'SampleProject'
 ext.runBlock = 'TMP_DIR="/data/tmpLog/$APP_NAME"\n' +
         'PID_PATH="$TMP_DIR/$APP_NAME.pid"\n' +
         'LOG_PATH="$TMP_DIR/$APP_NAME.log"\n' +
+	'mkdir -p $TMP_DIR\n' +
         'if [ -e "$PID_PATH" ]; then\n' +
         'echo "Application is already running!"\n' +
         'echo\n' +
@@ -27,3 +28,35 @@ ext.stopBlock = '#!/usr/bin/env sh\n' +
         'echo "Stopped"\n' +
         'echo\n' +
         'exit 1'
+ext.deployBlock = '#!/bin/bash\n' +
+	'local_dir=./\n' +
+	'server_dir=/hserver/projects/SampleProject\n' +
+	'user=ledaihoan\n' +
+	'#10.30.22.241\n' +
+	'servers=(35.201.222.105)\n' +
+	'\n' +
+	'i=0\n' +
+	'massdeploy=0\n' +
+	'\n' +
+	'while [ "x${servers[i]}" != "x" ]\n' +
+	'do\n' +
+	'    server=${servers[i]}\n' +
+	'    echo echo "Deploy on server $server";echo\n' +
+	'    rsync -auvr --delete $local_dir/* $user@$server:$server_dir/\n' +
+	'    echo;echo "Done $server"\n' +
+	'    i=$(( $i + 1 ))\n' +
+	'    if [ "x${servers[i]}" != "x" ]; then\n' +
+	'        if [ $massdeploy -eq 0 ]; then\n' +
+	'            echo;echo "Press Enter to continue update --- ${servers[i]}"\n' +
+	'            echo "Press \\"1 + Enter\\" to update all other"\n' +
+	'            read line\n' +
+	'            if [ "$line" == "1" ]; then\n' +
+	'                massdeploy=1\n' +
+	'            fi\n' +
+	'        else\n' +
+	'            continue\n' +
+	'        fi\n' +
+	'    else\n' +
+	'        echo "Done!!!"\n' +
+	'    fi\n' +
+	'done'
